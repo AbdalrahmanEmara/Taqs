@@ -35,6 +35,7 @@ export default function Search({ setWeather, cityQuery, setCityQuery, submit, se
             feelslike_f: feelsLikeF,
             wind_kph: wind,
             condition,
+            uv,
           } = res.data.current;
 
           const {
@@ -46,7 +47,7 @@ export default function Search({ setWeather, cityQuery, setCityQuery, submit, se
 
           // const condition = res.data.current.condition.text;
 
-          setWeather({ tempC, tempF, humidity, feelsLikeC, feelsLikeF, wind, condition, city, country });
+          setWeather({ tempC, tempF, humidity, feelsLikeC, feelsLikeF, wind, condition, city, country, uv });
 
           console.log(tempC, tempF);
 
