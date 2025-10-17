@@ -45,11 +45,8 @@ export default function Search({ setWeather, cityQuery, setCityQuery, submit, se
 
           const forecastDays = res.data.forecast.forecastday;
 
-          // const condition = res.data.current.condition.text;
-
           setWeather({ tempC, tempF, humidity, feelsLikeC, feelsLikeF, wind, condition, city, country, uv, forecastDays });
 
-          console.log(tempC, tempF);
 
           console.log(res.data);
           setSubmit(false);
