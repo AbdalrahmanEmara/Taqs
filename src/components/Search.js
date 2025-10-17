@@ -4,8 +4,15 @@ import axios from "axios";
 
 const KEY = "b4144a3a3ae54582aa974229251610";
 
-export default function Search({ setWeather, cityQuery, setCityQuery, submit, setSubmit, setIsLoading, setError }) {
-
+export default function Search({
+  setWeather,
+  cityQuery,
+  setCityQuery,
+  submit,
+  setSubmit,
+  setIsLoading,
+  setError,
+}) {
   useEffect(
     function () {
       if (!cityQuery || !submit) return;
@@ -13,16 +20,17 @@ export default function Search({ setWeather, cityQuery, setCityQuery, submit, se
       async function getQuery() {
         try {
           setIsLoading(true);
+          setError("");
 
           const res = await axios.get(
-            "http://api.weatherapi.com/v1/forecast.json",
+            "https://api.weatherapi.com/v1/forecast.json",
             {
               params: {
                 key: KEY,
                 q: cityQuery,
                 days: 5,
                 api: "no",
-                alert: "no",
+                alerts: "no",
               },
             }
           );
@@ -38,27 +46,63 @@ export default function Search({ setWeather, cityQuery, setCityQuery, submit, se
             uv,
           } = res.data.current;
 
-          const {
-            name: city,
-            country,
-          } = res.data.location;
+          const { name: city, country } = res.data.location;
 
           const forecastDays = res.data.forecast.forecastday;
 
-          setWeather({ tempC, tempF, humidity, feelsLikeC, feelsLikeF, wind, condition, city, country, uv, forecastDays });
-
-
-          console.log(res.data);
+          setWeather({
+            tempC,
+            tempF,
+            humidity,
+            feelsLikeC,
+            feelsLikeF,
+            wind,
+            condition,
+            city,
+            country,
+            uv,
+            forecastDays,
+          });
+        } catch (err) {
+          setWeather(null);
+          if (err.response) {
+            // Server responded with error status
+            if (err.response.status === 400) {
+              setError("City not found. Please check the spelling.");
+            } else if (err.response.status === 401) {
+              setError("Invalid API key.");
+            } else if (err.response.status === 403) {
+              setError("API key limit exceeded.");
+            } else {
+              setError("Unable to fetch weather data. Please try again.");
+            }
+            console.error("API Error:", err.response.data);
+          } else if (err.request) {
+            // Request made but no response
+            setError("No internet connection. Please check your network.");
+            console.error("Network Error:", err.request);
+          } else {
+            // Other errors
+            setError("Something went wrong. Please try again.");
+            console.error("Unexpected error:", err.message);
+          }
+        } finally {
           setSubmit(false);
           setIsLoading(false);
-        } catch (err) {
-          console.error(err.message);
-          setError(err.message);
+          setCityQuery("");
         }
       }
       getQuery();
     },
-    [submit]
+    [
+      submit,
+      cityQuery,
+      setWeather,
+      setError,
+      setIsLoading,
+      setSubmit,
+      setCityQuery,
+    ]
   );
 
   return (
