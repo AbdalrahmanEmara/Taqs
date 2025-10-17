@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
 
@@ -13,6 +13,15 @@ export default function Search({
   setIsLoading,
   setError,
 }) {
+
+  const inputRef = useRef(null);
+
+  useEffect(function() {
+    if(inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, [submit]);
+
   useEffect(
     function () {
       if (!cityQuery || !submit) return;
@@ -111,6 +120,7 @@ export default function Search({
       onSubmit={(e) => {
         e.preventDefault();
         setSubmit(true);
+        
       }}>
       <MdOutlineSearch className="inline-block text-2xl mx-2 text-gray-400" />
       <input
@@ -119,6 +129,7 @@ export default function Search({
         onChange={(e) => setCityQuery((cityQuery) => e.target.value)}
         placeholder="Search for a city..."
         className="bg-transparent outline-none text-white flex-grow p-1"
+        ref={inputRef}
       />
     </form>
   );

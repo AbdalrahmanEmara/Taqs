@@ -25,7 +25,7 @@ export default function WeatherDetails({
 
       {!isLoading && !error && !weather && (
         <p className="text-primary flex mt-48 justify-center text-5xl font-bold">
-          Enter city
+          Enter a city
         </p>
       )}
 
