@@ -11,7 +11,7 @@ export default function WeatherDetails({ weather, isLoading }) {
     {!isLoading && weather &&     
     (<div className="grid grid-cols-3 gap-7 text-white mt-6">
       <TodayWeather weather={weather} />
-      <Forecast />
+      <Forecast forecastDays={weather.forecastDays} />
     </div>) }
 
     {!isLoading && !weather && <p className="text-primary flex mt-48 justify-center text-5xl font-bold">Enter city</p>}

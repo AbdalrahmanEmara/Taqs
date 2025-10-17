@@ -7,9 +7,6 @@ export default function TodayWeather({ weather }) {
     day: "numeric",
     month: "long",
   });
-
-  console.log(weather);
-
   return (
     <div className="today-weather col-span-3 lg:col-span-1 bg-slate-800 rounded-lg p-5">
 
