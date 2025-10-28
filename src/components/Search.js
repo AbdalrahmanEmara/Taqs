@@ -3,6 +3,7 @@ import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
 
 const KEY = "b4144a3a3ae54582aa974229251610";
+const CITYNAMEKEY = "cd2ff3b48cmsh5bf99a28c9068a1p177b0fjsnd1d2bdf449bf";
 
 export default function Search({
   setWeather,
@@ -13,18 +14,23 @@ export default function Search({
   setIsLoading,
   setError,
 }) {
-
   const inputRef = useRef(null);
-
-  useEffect(function() {
-    if(inputRef.current) {
-      inputRef.current.blur();
-    }
-  }, [submit]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [lat, setLat] = useState('');
+  const [lng, setLng] = useState('');
 
   useEffect(
     function () {
-      if (!cityQuery || !submit) return;
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
+    },
+    [submit]
+  );
+
+  useEffect(
+    function () {
+      if (!cityQuery || !submit || (!lat && !lng)) return;
 
       async function getQuery() {
         try {
@@ -36,7 +42,7 @@ export default function Search({
             {
               params: {
                 key: KEY,
-                q: cityQuery,
+                q: `${lat},${lng}`,
                 days: 5,
                 api: "no",
                 alerts: "no",
@@ -45,8 +51,8 @@ export default function Search({
           );
 
           const {
-            heatindex_c: tempC,
-            heatindex_f: tempF,
+            temp_c: tempC,
+            temp_f: tempF,
             humidity,
             feelslike_c: feelsLikeC,
             feelslike_f: feelsLikeF,
@@ -99,9 +105,54 @@ export default function Search({
           setSubmit(false);
           setIsLoading(false);
           setCityQuery("");
+          setSuggestions([]);
         }
       }
       getQuery();
+    },
+    [
+      lat, lng, submit
+    ]
+  );
+
+  useEffect(
+    function () {
+      if (!cityQuery) return;
+
+      const timer = setTimeout(async function () {
+        try {
+          const res = await axios.get(
+            "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
+            {
+              params: { namePrefix: cityQuery, limit: 10 },
+              headers: {
+                "x-rapidapi-key": CITYNAMEKEY,
+                "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
+              },
+            }
+          );
+
+          const arr = res.data.data;
+
+          const uniqueData = Array.from(
+            new Map(
+              arr.map((item) => [`${item.city}|${item.country}`, item])
+            ).values()
+          );
+
+          const finalFormData = uniqueData.map(item => {
+            return {
+              city: item.city, country: item.country, lat: item.latitude, lng: item.longitude
+            }
+          });
+
+          setSuggestions(finalFormData);
+        } catch (err) {
+          console.error(err.message);
+        }
+      }, 1000);
+
+      return () => clearTimeout(timer);
     },
     [
       submit,
@@ -115,22 +166,38 @@ export default function Search({
   );
 
   return (
-    <form
-      className="p-2 flex items-center bg-slate-800 rounded-lg"
-      onSubmit={(e) => {
-        e.preventDefault();
-        setSubmit(true);
-        
-      }}>
-      <MdOutlineSearch className="inline-block text-2xl mx-2 text-gray-400" />
-      <input
-        type="text"
-        value={cityQuery}
-        onChange={(e) => setCityQuery((cityQuery) => e.target.value)}
-        placeholder="Search for a city..."
-        className="bg-transparent outline-none text-white flex-grow p-1"
-        ref={inputRef}
-      />
-    </form>
+    <>
+      <form
+        className="p-2 flex items-center bg-slate-800 rounded-lg"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setSubmit(true);
+        }}>
+        <MdOutlineSearch className="inline-block text-2xl mx-2 text-gray-400" />
+        <input
+          type="text"
+          value={cityQuery}
+          onChange={(e) => setCityQuery((cityQuery) => e.target.value)}
+          placeholder="Search for a city..."
+          className="bg-transparent outline-none text-white flex-grow p-1"
+          ref={inputRef}
+        />
+      </form>
+      {suggestions[0]?.city && (
+        <div className="absolute w-full pr-12">
+          <ul className="text-slate-400  bg-slate-800 opacity-70 mt-2 rounded-xl p-3">
+            {suggestions.map((s, i) => (
+              <li className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600" key={i} onClick={() => {
+                setLat(suggestions[i].lat);
+                setLng(suggestions[i].lng);
+                setSubmit(true);
+              }}>
+                {s.city}, {s.country}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
   );
 }

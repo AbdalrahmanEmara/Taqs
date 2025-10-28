@@ -5,14 +5,14 @@ import WeatherDetails from "./WeatherDetails";
 
 function App() {
   const [weather, setWeather] = useState(null);
-  const [cityQuery, setCityQuery] = useState("");
+  const [cityQuery, setCityQuery] = useState('');
   const [submit, setSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tempType, setTempType] = useState("C");
 
   return (
-    <div className="App m-auto p-6 md:max-w-3xl lg:max-w-4xl">
+    <div className="App mx-auto p-6 md:w-full  lg:max-w-4xl max-w-full relative">
       <Header tempType={tempType} onChangeTempType={setTempType} />
       <Search setWeather={setWeather} cityQuery={cityQuery} setCityQuery={setCityQuery} submit={submit} setSubmit={setSubmit} setIsLoading={setIsLoading} setError={setError} />
       <WeatherDetails weather={weather} isLoading={isLoading} tempType={tempType} error={error} setError={setError} />

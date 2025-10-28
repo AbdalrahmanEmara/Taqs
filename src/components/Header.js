@@ -14,13 +14,13 @@ export default function Header({ tempType, onChangeTempType }) {
           <button
             className="h-6 w-12 rounded-full box-border bg-slate-500 flex justify-start"
             onClick={() => onChangeTempType((cur) => (cur === "C" ? "F" : "C"))}>
-            <span className="circle inline-block  py-3 px-3 rounded-full bg-slate-300 z-10"></span>
+            <span className="circle inline-block  py-3 px-3 rounded-full bg-slate-300 z-10 transition duration-300 "></span>
           </button>
         ) : (
           <button
             className="h-6 w-12 rounded-full box-border bg-slate-500 flex justify-end"
             onClick={() => onChangeTempType((cur) => (cur === "C" ? "F" : "C"))}>
-            <span className="circle inline-block  py-3 px-3 rounded-full bg-slate-300 z-10"></span>
+            <span className="circle inline-block  py-3 px-3 rounded-full bg-green-500 z-10 transition duration-300"></span>
           </button>
         )}{" "}
         °F
