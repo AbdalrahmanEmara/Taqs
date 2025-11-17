@@ -44,7 +44,7 @@ export default function Search({
 
       fetchLocation();
     }
-  , [])
+  , []);
 
   useEffect(
     function () {
@@ -67,6 +67,7 @@ export default function Search({
               },
             }
           );
+          console.log(res.data);
 
           const {
             temp_c: tempC,

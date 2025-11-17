@@ -1,4 +1,5 @@
 import Forecast from "./Forecast";
+import Spinner from "./Spinner";
 import TodayWeather from "./TodayWeather";
 import { BiSolidError } from "react-icons/bi";
 
@@ -12,7 +13,7 @@ export default function WeatherDetails({
     <>
       {isLoading && (
         <p className="text-primary flex mt-48 justify-center text-5xl font-bold">
-          Loading...
+          <Spinner />
         </p>
       )}
 
