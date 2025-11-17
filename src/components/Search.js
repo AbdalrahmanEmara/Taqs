@@ -16,8 +16,8 @@ export default function Search({
 }) {
   const inputRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
-  const [lat, setLat] = useState('');
-  const [lng, setLng] = useState('');
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
 
   useEffect(
     function () {
@@ -30,7 +30,25 @@ export default function Search({
 
   useEffect(
     function () {
-      if (!cityQuery || !submit || (!lat && !lng)) return;
+      async function fetchLocation () {
+        if(navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              console.log(position);
+              setLat(position.coords.latitude);
+              setLng(position.coords.longitude);
+            }
+          )
+        }
+      }
+
+      fetchLocation();
+    }
+  , [])
+
+  useEffect(
+    function () {
+      if (!cityQuery && !submit && (!lat && !lng)) return;
 
       async function getQuery() {
         try {
@@ -110,9 +128,7 @@ export default function Search({
       }
       getQuery();
     },
-    [
-      lat, lng, submit
-    ]
+    [lat, lng, submit]
   );
 
   useEffect(
@@ -140,10 +156,13 @@ export default function Search({
             ).values()
           );
 
-          const finalFormData = uniqueData.map(item => {
+          const finalFormData = uniqueData.map((item) => {
             return {
-              city: item.city, country: item.country, lat: item.latitude, lng: item.longitude
-            }
+              city: item.city,
+              country: item.country,
+              lat: item.latitude,
+              lng: item.longitude,
+            };
           });
 
           setSuggestions(finalFormData);
@@ -184,14 +203,17 @@ export default function Search({
         />
       </form>
       {suggestions[0]?.city && (
-        <div className="absolute w-full pr-12">
+        <div className="search-container absolute">
           <ul className="text-slate-400  bg-slate-800 opacity-70 mt-2 rounded-xl p-3">
             {suggestions.map((s, i) => (
-              <li className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600" key={i} onClick={() => {
-                setLat(suggestions[i].lat);
-                setLng(suggestions[i].lng);
-                setSubmit(true);
-              }}>
+              <li
+                className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600"
+                key={i}
+                onClick={() => {
+                  setLat(suggestions[i].lat);
+                  setLng(suggestions[i].lng);
+                  setSubmit(true);
+                }}>
                 {s.city}, {s.country}
               </li>
             ))}

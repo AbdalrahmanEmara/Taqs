@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: #0c1425;
+}
+
+div.search-container {
+  width: calc(100% - 50px)
 }

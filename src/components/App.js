@@ -12,7 +12,7 @@ function App() {
   const [tempType, setTempType] = useState("C");
 
   return (
-    <div className="App mx-auto p-6 md:w-full  lg:max-w-4xl max-w-full relative">
+    <div className="App mx-auto p-6 md:w-full  lg:max-w-4xl max-w-full relative bg-linear-to-br from-sky-500 to-indigo-500">
       <Header tempType={tempType} onChangeTempType={setTempType} />
       <Search setWeather={setWeather} cityQuery={cityQuery} setCityQuery={setCityQuery} submit={submit} setSubmit={setSubmit} setIsLoading={setIsLoading} setError={setError} />
       <WeatherDetails weather={weather} isLoading={isLoading} tempType={tempType} error={error} setError={setError} />
