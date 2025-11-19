@@ -1,14 +1,11 @@
+import { useWeather } from "../context/weatherContext";
 import Forecast from "./Forecast";
 import Spinner from "./Spinner";
 import TodayWeather from "./TodayWeather";
 import { BiSolidError } from "react-icons/bi";
 
-export default function WeatherDetails({
-  weather,
-  isLoading,
-  error,
-  tempType,
-}) {
+export default function WeatherDetails() {
+  const { weather, isLoading, error, tempType } = useWeather();
   return (
     <>
       {isLoading && (
@@ -32,10 +29,10 @@ export default function WeatherDetails({
 
       {error && (
         <div className="flex justify-center flex-col gap-3 mt-48 items-center">
-        <BiSolidError className="text-orange-600 text-7xl text-center"/>
-        <p className="text-orange-600 flex justify-center text-3xl font-bold text-center">
-          {error}
-        </p>
+          <BiSolidError className="text-orange-600 text-7xl text-center" />
+          <p className="text-orange-600 flex justify-center text-3xl font-bold text-center">
+            {error}
+          </p>
         </div>
       )}
     </>

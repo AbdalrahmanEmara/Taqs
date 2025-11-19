@@ -1,23 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
+import { useWeather } from "../context/weatherContext";
 
 const KEY = "b4144a3a3ae54582aa974229251610";
 const CITYNAMEKEY = "cd2ff3b48cmsh5bf99a28c9068a1p177b0fjsnd1d2bdf449bf";
 
-export default function Search({
-  setWeather,
-  cityQuery,
-  setCityQuery,
-  submit,
-  setSubmit,
-  setIsLoading,
-  setError,
-}) {
+export default function Search() {
+  const [cityQuery, setCityQuery] = useState("");
   const inputRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
+  const [submit, setSubmit] = useState(false);
+  const [error, setError] = useState("");
+
+  const {dispatch, lat, lng} = useWeather();
 
   useEffect(
     function () {
@@ -30,30 +26,12 @@ export default function Search({
 
   useEffect(
     function () {
-      async function fetchLocation () {
-        if(navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              console.log(position);
-              setLat(position.coords.latitude);
-              setLng(position.coords.longitude);
-            }
-          )
-        }
-      }
-
-      fetchLocation();
-    }
-  , []);
-
-  useEffect(
-    function () {
       if (!cityQuery && !submit && (!lat && !lng)) return;
 
       async function getQuery() {
         try {
-          setIsLoading(true);
-          setError("");
+
+
 
           const res = await axios.get(
             "https://api.weatherapi.com/v1/forecast.json",
@@ -67,7 +45,6 @@ export default function Search({
               },
             }
           );
-          console.log(res.data);
 
           const {
             temp_c: tempC,
@@ -84,7 +61,7 @@ export default function Search({
 
           const forecastDays = res.data.forecast.forecastday;
 
-          setWeather({
+          const currentWeather = {
             tempC,
             tempF,
             humidity,
@@ -96,9 +73,9 @@ export default function Search({
             country,
             uv,
             forecastDays,
-          });
+          };
+          dispatch({type: "weather/loaded", payload: currentWeather});
         } catch (err) {
-          setWeather(null);
           if (err.response) {
             // Server responded with error status
             if (err.response.status === 400) {
@@ -110,6 +87,7 @@ export default function Search({
             } else {
               setError("Unable to fetch weather data. Please try again.");
             }
+            dispatch({type: "error", payload: error});
             console.error("API Error:", err.response.data);
           } else if (err.request) {
             // Request made but no response
@@ -122,7 +100,7 @@ export default function Search({
           }
         } finally {
           setSubmit(false);
-          setIsLoading(false);
+          dispatch({type: "readyToFetch"});
           setCityQuery("");
           setSuggestions([]);
         }
@@ -177,9 +155,7 @@ export default function Search({
     [
       submit,
       cityQuery,
-      setWeather,
       setError,
-      setIsLoading,
       setSubmit,
       setCityQuery,
     ]
@@ -211,8 +187,7 @@ export default function Search({
                 className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600"
                 key={i}
                 onClick={() => {
-                  setLat(suggestions[i].lat);
-                  setLng(suggestions[i].lng);
+                  dispatch({type: "loadingCoords", payload: {lat, lng}});
                   setSubmit(true);
                 }}>
                 {s.city}, {s.country}
