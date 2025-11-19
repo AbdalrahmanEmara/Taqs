@@ -13,7 +13,7 @@ export default function Search() {
   const [submit, setSubmit] = useState(false);
   const [error, setError] = useState("");
 
-  const {dispatch, lat, lng} = useWeather();
+  const { dispatch, lat, lng } = useWeather();
 
   useEffect(
     function () {
@@ -26,13 +26,10 @@ export default function Search() {
 
   useEffect(
     function () {
-      if (!cityQuery && !submit && (!lat && !lng)) return;
+      if (!cityQuery && !submit && !lat && !lng) return;
 
       async function getQuery() {
         try {
-
-
-
           const res = await axios.get(
             "https://api.weatherapi.com/v1/forecast.json",
             {
@@ -74,7 +71,7 @@ export default function Search() {
             uv,
             forecastDays,
           };
-          dispatch({type: "weather/loaded", payload: currentWeather});
+          dispatch({ type: "weather/loaded", payload: currentWeather });
         } catch (err) {
           if (err.response) {
             // Server responded with error status
@@ -87,7 +84,7 @@ export default function Search() {
             } else {
               setError("Unable to fetch weather data. Please try again.");
             }
-            dispatch({type: "error", payload: error});
+            dispatch({ type: "error", payload: error });
             console.error("API Error:", err.response.data);
           } else if (err.request) {
             // Request made but no response
@@ -100,7 +97,7 @@ export default function Search() {
           }
         } finally {
           setSubmit(false);
-          dispatch({type: "readyToFetch"});
+          dispatch({ type: "readyToFetch" });
           setCityQuery("");
           setSuggestions([]);
         }
@@ -152,13 +149,7 @@ export default function Search() {
 
       return () => clearTimeout(timer);
     },
-    [
-      submit,
-      cityQuery,
-      setError,
-      setSubmit,
-      setCityQuery,
-    ]
+    [submit, cityQuery, setError, setSubmit, setCityQuery]
   );
 
   return (
@@ -187,7 +178,7 @@ export default function Search() {
                 className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600"
                 key={i}
                 onClick={() => {
-                  dispatch({type: "loadingCoords", payload: {lat, lng}});
+                  dispatch({ type: "loadingCoords", payload: { lat: s.lat, lng: s.lng } });
                   setSubmit(true);
                 }}>
                 {s.city}, {s.country}
