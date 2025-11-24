@@ -10,23 +10,23 @@ export default function Search() {
   const [cityQuery, setCityQuery] = useState("");
   const inputRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
-  const [submit, setSubmit] = useState(false);
+  // const [submit, setSubmit] = useState(false);
   const [error, setError] = useState("");
 
   const { dispatch, lat, lng } = useWeather();
 
-  useEffect(
-    function () {
-      if (inputRef.current) {
-        inputRef.current.blur();
-      }
-    },
-    [submit]
-  );
+  // useEffect(
+  //   function () {
+  //     if (inputRef.current) {
+  //       inputRef.current.blur();
+  //     }
+  //   },
+  //   [submit]
+  // );
 
   useEffect(
     function () {
-      if (!cityQuery && !submit && !lat && !lng) return;
+      if (!lat && !lng) return;
 
       async function getQuery() {
         try {
@@ -84,7 +84,6 @@ export default function Search() {
             } else {
               setError("Unable to fetch weather data. Please try again.");
             }
-            dispatch({ type: "error", payload: error });
             console.error("API Error:", err.response.data);
           } else if (err.request) {
             // Request made but no response
@@ -95,21 +94,20 @@ export default function Search() {
             setError("Something went wrong. Please try again.");
             console.error("Unexpected error:", err.message);
           }
+          dispatch({type: "error", payload: error});
         } finally {
-          setSubmit(false);
-          dispatch({ type: "readyToFetch" });
           setCityQuery("");
           setSuggestions([]);
         }
       }
       getQuery();
     },
-    [lat, lng, submit]
+    [lat, lng, dispatch, error]
   );
 
   useEffect(
     function () {
-      if (!cityQuery) return;
+      if (!cityQuery) return setSuggestions("");
 
       const timer = setTimeout(async function () {
         try {
@@ -149,17 +147,13 @@ export default function Search() {
 
       return () => clearTimeout(timer);
     },
-    [submit, cityQuery, setError, setSubmit, setCityQuery]
+    [cityQuery]
   );
 
   return (
     <>
       <form
-        className="p-2 flex items-center bg-slate-800 rounded-lg"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setSubmit(true);
-        }}>
+        className="p-2 flex items-center bg-slate-800 rounded-lg">
         <MdOutlineSearch className="inline-block text-2xl mx-2 text-gray-400" />
         <input
           type="text"
@@ -179,7 +173,7 @@ export default function Search() {
                 key={i}
                 onClick={() => {
                   dispatch({ type: "loadingCoords", payload: { lat: s.lat, lng: s.lng } });
-                  setSubmit(true);
+                  setSuggestions("");
                 }}>
                 {s.city}, {s.country}
               </li>

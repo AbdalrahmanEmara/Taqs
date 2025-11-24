@@ -1,10 +1,9 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
 
 const WeatherContext = createContext();
 
 const initialState = {
   weather: "",
-  tempType: "C",
   lat: "",
   lng: "",
   isLoading: false,
@@ -22,7 +21,7 @@ function reducer(state, action) {
     case "loadingCoords":
       return {
         ...state,
-        weather: null,
+        // weather: null,
         lat: action.payload.lat,
         lng: action.payload.lng,
         isLoading: true,
@@ -44,6 +43,7 @@ function reducer(state, action) {
       return {
         ...state,
         error: action.payload,
+        isLoading: false,
       };
 
     default:
@@ -52,7 +52,8 @@ function reducer(state, action) {
 }
 
 function WeatherProvider({ children }) {
-  const [{ weather, isLoading, error, lat, lng, tempType } , dispatch] = useReducer(reducer, initialState);
+  const [tempType, setTempType] = useState('C');
+  const [{ weather, isLoading, error, lat, lng } , dispatch] = useReducer(reducer, initialState);
 
   useEffect(function () {
     async function fetchLocation() {
@@ -74,7 +75,7 @@ function WeatherProvider({ children }) {
   }, []);
 
   return (
-    <WeatherContext.Provider value={{ dispatch, weather, isLoading, error, lat, lng, tempType }}>{children}</WeatherContext.Provider>
+    <WeatherContext.Provider value={{ dispatch, weather, isLoading, error, lat, lng, tempType, setTempType }}>{children}</WeatherContext.Provider>
   );
 }
 
