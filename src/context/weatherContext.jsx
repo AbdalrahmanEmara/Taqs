@@ -56,10 +56,11 @@ function WeatherProvider({ children }) {
   const [{ weather, isLoading, error, lat, lng } , dispatch] = useReducer(reducer, initialState);
 
   useEffect(function () {
-    async function fetchLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          console.log(position);
+  async function fetchLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Location obtained:", position);
           dispatch({
             type: "loadingCoords",
             payload: {
@@ -67,12 +68,31 @@ function WeatherProvider({ children }) {
               lng: position.coords.longitude,
             },
           });
-        });
-      }
+        },
+        (error) => {
+          // Handle errors (permission denied, timeout, etc.)
+          console.error("Geolocation error:", error);
+          dispatch({
+            type: "error",
+            payload: `Location error: ${error.message}`,
+          });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      dispatch({
+        type: "error",
+        payload: "Geolocation is not supported by your browser",
+      });
     }
+  }
 
-    fetchLocation();
-  }, []);
+  fetchLocation();
+}, []);
 
   return (
     <WeatherContext.Provider value={{ dispatch, weather, isLoading, error, lat, lng, tempType, setTempType }}>{children}</WeatherContext.Provider>

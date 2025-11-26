@@ -17,12 +17,11 @@ export default function WeatherDetails() {
       )}
 
       {!isLoading && !error && weather && (
-        <div className="grid grid-cols-5 gap-7 grid-rows-3 text-white mt-6">
+        <div className="grid grid-cols-5 gap-y-7 gap-x-7 md:gap-x-7 grid-rows-5 text-white mt-6">
           <TodayWeather weather={weather} tempType={tempType} />
           <MoreDayInfo />
           <Cards />
           <Forecast forecastDays={weather.forecastDays} tempType={tempType} />
-          
         </div>
       )}
 

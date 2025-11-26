@@ -24,6 +24,11 @@ module.exports = {
         "linear-to-b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
         "linear-45": "linear-gradient(45deg, var(--tw-gradient-stops))",
       },
+      screens: {
+        "miniMob": "400px",
+        "mob": "530px",
+        "tablet": "800px",
+      },
     },
   },
   plugins: [],

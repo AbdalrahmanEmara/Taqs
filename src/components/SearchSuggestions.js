@@ -6,7 +6,7 @@ export default function SearchSuggestions({suggestions, setSuggestions}) {
 
   return (
     <div className="search-container absolute">
-          <ul className="text-slate-400  bg-slate-800 opacity-70 mt-2 rounded-xl p-3">
+          <ul className="text-cyan-600  bg-[#0E1421] mt-2 rounded-xl p-3">
             {suggestions.map((s, i) => (
               <li
                 className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600"

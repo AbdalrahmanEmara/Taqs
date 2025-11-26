@@ -18,6 +18,6 @@ div.search-container {
 
 @layer components {
   .bigBox {
-    @apply col-span-5 lg:col-span-3  bg-[#0E1421] rounded-[30px] p-5 grid grid-cols-2
+    @apply col-span-5 tablet:col-span-3  bg-[#0E1421] rounded-[30px] p-5 grid grid-cols-2
   }
 }

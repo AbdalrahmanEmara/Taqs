@@ -14,7 +14,6 @@ export default function Search() {
   const [cityQuery, setCityQuery] = useState("");
   const inputRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
-  // const [submit, setSubmit] = useState(false);
   const [error, setError] = useState("");
 
   const { dispatch, lat, lng } = useWeather();

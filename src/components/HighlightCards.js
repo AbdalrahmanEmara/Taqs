@@ -5,28 +5,30 @@ import { TbUvIndex } from "react-icons/tb";
 import { FaTemperatureHalf } from "react-icons/fa6";
 
 import Card from "./HighlightCard";
+import { useWeather } from "../context/weatherContext";
 
 export default function Cards() {
+  const {weather, tempType} = useWeather();
   return (
     <>
-      <div className="col-span-6 md:col-span-2 bg-radial from-[#162850] to-[#121A2D] p-4 rounded-2xl">
-        <p className="mb-4 font-semibold text-lg ml-2">Today Highlight</p>
+      <div className="col-span-5 tablet:col-span-2 row-span-1 bg-radial from-[#162850] to-[#121A2D] p-4 rounded-2xl">
+        <p className="mb-4 font-semibold text-xl ml-2">Today Highlight</p>
         <div className="grid grid-rows-2 grid-cols-2 gap-3 flex-wrap text-center">
-          <Card name={"Humidity"} value={"60%"}>
+          <Card name={"Humidity"} value={weather.humidity}>
             <WiHumidity className="text-sky-500 text-4xl" />
           </Card>
-          <Card name={"Wind Speed"} value={"15 km/h"}>
+          <Card name={"Wind Speed"} value={`${weather.wind} km/h`}>
             <FaWind className="text-sky-500 text-4xl" />
           </Card>
           <Card
             name={"Feels Like"}
-            value={"30"}
+            value={`${Math.round(tempType === "C" ? weather.forecastDays[0].hour[0].feelslike_c : weather.forecastDays[0].hour[0].feelslike_f)}°`}
             >
             <FaTemperatureHalf className="text-sky-500 text-4xl" />
           </Card>
           <Card
             name={"UV Index"}
-            value={"5"}
+            value={weather.uv}
             >
             <TbUvIndex className="text-sky-500 text-4xl" />
           </Card>

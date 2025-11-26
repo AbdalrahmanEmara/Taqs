@@ -14,8 +14,8 @@ export default function TodayWeather({ weather, tempType }) {
   console.log(weather);
   const weekday = formattedDate.split(" ")[0].slice(0, -1);
   return (
-    <div className="bigBox" >
-      <div className="flex gap-6 flex-col sm:gap-8 ">
+    <div className="bigBox row-span-1" >
+      <div className="flex gap-8 flex-col ">
         <div className="text-white bg-[#742BEC] flex gap-1 text-sm font-semibold py-2 pl-3 pr-6 rounded-full items-center justify-center w-fit">
           <MdLocationOn />
           {weather.country}
@@ -35,43 +35,31 @@ export default function TodayWeather({ weather, tempType }) {
               : `${Math.round(weather.tempF)}°F`}
           </span>
           <p>
-            High: {weather.tempC} Low: {weather.tempC}
+            High: {tempType === "C"
+              ? `${Math.round(weather.forecastDays[0].day.maxtemp_c)}°C`
+              : `${Math.round(weather.forecastDays[0].day.maxtemp_f)}°F`} Low: {tempType === "C"
+              ? `${Math.round(weather.forecastDays[0].day.mintemp_c)}°C`
+              : `${Math.round(weather.forecastDays[0].day.mintemp_c)}°F`}
           </p>
         </div>
       </div>
-      <div className="flex items-end  flex-col">
-        <div>
+      <div className="flex items-end flex-col">
           <img
             src={weather.condition.icon}
-            className="text-primary w-40 mt-3 sm:w-48"
+            className="text-primary mt-6 w-24 miniMob:w-32 mob:w-40"
             alt="weather-icon"
           />
 
-          <div className="text-center">
+          <div className="text-center mob:pr-6">
             <p className="text-2xl font-semibold mb-1 ">
               {weather.forecastDays[0].day.condition.text}
             </p>
             <p>
               Feels like{" "}
-              {Math.round(tempType === "C" ? weather.tempC : weather.tempF)}°
+              {Math.round(tempType === "C" ? weather.forecastDays[0].hour[0].feelslike_c : weather.forecastDays[0].hour[0].feelslike_f)}°
             </p>
           </div>
-        </div>
       </div>
     </div>
   );
 }
-
-//         <span className="text-6xl font-bold">
-//           {Math.round(tempType === "C" ? weather.tempC : weather.tempF)}°
-//         </span>
-//         <p className="weather-description text-xl text-slate-400 mb-5">
-//           {weather.condition.text}
-//         </p>
-//         <p className="location text-xl font-bold">
-//           {weather.city},{" "}
-//           {weather.country.split(" ").length > 1
-// ? weather.country.split(" ").map((w) => w[0].toUpperCase())
-//             : weather.country}
-//         </p>
-//         <p className="date text-slate-400 ">{formattedDate}</p>
