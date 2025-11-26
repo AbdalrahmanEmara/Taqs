@@ -13,7 +13,7 @@ export default function SunriseSunset() {
           </span>
           <div className="relative">
             <p className="text-xl font-semibold">{sunrise.split(" ")[0]}</p>
-            <span className="absolute right-0 top-1 mob:top-6">
+            <span className="text-slate-500 absolute right-0 top-1 mob:top-6">
               {sunrise.split(" ")[1]}
             </span>
           </div>
@@ -24,7 +24,7 @@ export default function SunriseSunset() {
           </span>
           <div className="relative">
             <p className="text-xl font-semibold">{sunset.split(" ")[0]}</p>
-            <span className="absolute right-0 top-1 mob:top-6">
+            <span className="text-slate-500 absolute right-0 top-1 mob:top-6">
               {sunset.split(" ")[1]}
             </span>
           </div>

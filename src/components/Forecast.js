@@ -3,7 +3,7 @@ import ComingDay from "./ComingDay";
 export default function Forecast({ forecastDays, tempType }) {
   return (
     <div className="col-span-5 tablet:col-span-2">
-      <h1 className="font-bold p-2 text-[20px]">5-Day Forecast</h1>
+      <h1 className="font-bold p-2 text-[20px]">3-Day Forecast</h1>
       <div className="flex gap-3 flex-wrap">
         {forecastDays.map((day, i) => (
           <ComingDay
