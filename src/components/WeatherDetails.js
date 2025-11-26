@@ -1,8 +1,10 @@
 import { useWeather } from "../context/weatherContext";
+import Cards from "./HighlightCards";
 import Forecast from "./Forecast";
 import Spinner from "./Spinner";
 import TodayWeather from "./TodayWeather";
 import { BiSolidError } from "react-icons/bi";
+import MoreDayInfo from "./MoreDayInfo";
 
 export default function WeatherDetails() {
   const { weather, isLoading, error, tempType } = useWeather();
@@ -15,9 +17,12 @@ export default function WeatherDetails() {
       )}
 
       {!isLoading && !error && weather && (
-        <div className="grid grid-cols-3 gap-7 text-white mt-6">
+        <div className="grid grid-cols-5 gap-7 grid-rows-3 text-white mt-6">
           <TodayWeather weather={weather} tempType={tempType} />
+          <MoreDayInfo />
+          <Cards />
           <Forecast forecastDays={weather.forecastDays} tempType={tempType} />
+          
         </div>
       )}
 

@@ -9,9 +9,15 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #0c1425;
+  background-color: #060C1A;
 }
 
 div.search-container {
   width: calc(100% - 50px)
+}
+
+@layer components {
+  .bigBox {
+    @apply col-span-5 lg:col-span-3  bg-[#0E1421] rounded-[30px] p-5 grid grid-cols-2
+  }
 }

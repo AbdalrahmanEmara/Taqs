@@ -1,12 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
 import { useWeather } from "../context/weatherContext";
+import SearchSuggestions from "./SearchSuggestions";
+import { debounce } from "lodash";
+import { CiYoutube } from "react-icons/ci";
 
-const KEY = "b4144a3a3ae54582aa974229251610";
+const KEY = "81a355aac55648eb805160737252411";
 const CITYNAMEKEY = "cd2ff3b48cmsh5bf99a28c9068a1p177b0fjsnd1d2bdf449bf";
 
 export default function Search() {
+  const bouncingDelay = 500;
   const [cityQuery, setCityQuery] = useState("");
   const inputRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
@@ -14,15 +18,6 @@ export default function Search() {
   const [error, setError] = useState("");
 
   const { dispatch, lat, lng } = useWeather();
-
-  // useEffect(
-  //   function () {
-  //     if (inputRef.current) {
-  //       inputRef.current.blur();
-  //     }
-  //   },
-  //   [submit]
-  // );
 
   useEffect(
     function () {
@@ -43,6 +38,8 @@ export default function Search() {
             }
           );
 
+          console.log(res);
+
           const {
             temp_c: tempC,
             temp_f: tempF,
@@ -57,6 +54,7 @@ export default function Search() {
           const { name: city, country } = res.data.location;
 
           const forecastDays = res.data.forecast.forecastday;
+          console.log(res);
 
           const currentWeather = {
             tempC,
@@ -94,7 +92,7 @@ export default function Search() {
             setError("Something went wrong. Please try again.");
             console.error("Unexpected error:", err.message);
           }
-          dispatch({type: "error", payload: error});
+          dispatch({ type: "error", payload: error });
         } finally {
           setCityQuery("");
           setSuggestions([]);
@@ -104,56 +102,61 @@ export default function Search() {
     },
     [lat, lng, dispatch, error]
   );
+  
+  const debouncedFetchSuggestions = useCallback(
+    debounce(async (query) => {
+      try {
+        const res = await axios.get(
+          "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
+          {
+            params: { namePrefix: query, limit: 10 },
+            headers: {
+              "x-rapidapi-key": CITYNAMEKEY,
+              "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
+            },
+          }
+        );
+        const arr = res.data.data;
 
-  useEffect(
-    function () {
-      if (!cityQuery) return setSuggestions("");
+        const uniqueData = Array.from(
+          new Map(
+            arr.map((item) => [`${item.city}|${item.country}`, item])
+          ).values()
+        );
 
-      const timer = setTimeout(async function () {
-        try {
-          const res = await axios.get(
-            "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
-            {
-              params: { namePrefix: cityQuery, limit: 10 },
-              headers: {
-                "x-rapidapi-key": CITYNAMEKEY,
-                "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
-              },
-            }
-          );
+        const finalFormData = uniqueData.map((item) => {
+          return {
+            city: item.city,
+            country: item.country,
+            lat: item.latitude,
+            lng: item.longitude,
+          };
+        });
 
-          const arr = res.data.data;
-
-          const uniqueData = Array.from(
-            new Map(
-              arr.map((item) => [`${item.city}|${item.country}`, item])
-            ).values()
-          );
-
-          const finalFormData = uniqueData.map((item) => {
-            return {
-              city: item.city,
-              country: item.country,
-              lat: item.latitude,
-              lng: item.longitude,
-            };
-          });
-
-          setSuggestions(finalFormData);
-        } catch (err) {
-          console.error(err.message);
-        }
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    },
-    [cityQuery]
+        setSuggestions(finalFormData);
+      } catch (err) {
+        console.error(err.message);
+      }
+    }, bouncingDelay, {
+      "leading": false,
+      "trailing": true
+    }),
+    []
   );
+
+  useEffect(() => {
+    if (!cityQuery) {
+      setSuggestions([]);
+      return;
+    }
+    debouncedFetchSuggestions(cityQuery);
+  }, [cityQuery, debouncedFetchSuggestions]);
 
   return (
     <>
       <form
-        className="p-2 flex items-center bg-slate-800 rounded-lg">
+        onSubmit={(e) => e.preventDefault()}
+        className="p-2 flex items-center bg-[#0E1421] rounded-lg">
         <MdOutlineSearch className="inline-block text-2xl mx-2 text-gray-400" />
         <input
           type="text"
@@ -165,21 +168,10 @@ export default function Search() {
         />
       </form>
       {suggestions[0]?.city && (
-        <div className="search-container absolute">
-          <ul className="text-slate-400  bg-slate-800 opacity-70 mt-2 rounded-xl p-3">
-            {suggestions.map((s, i) => (
-              <li
-                className="py-2 pl-2 rounded-lg hover:text-slate-50 hover:bg-slate-600"
-                key={i}
-                onClick={() => {
-                  dispatch({ type: "loadingCoords", payload: { lat: s.lat, lng: s.lng } });
-                  setSuggestions("");
-                }}>
-                {s.city}, {s.country}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <SearchSuggestions
+          suggestions={suggestions}
+          setSuggestions={setSuggestions}
+        />
       )}
     </>
   );
