@@ -17,7 +17,7 @@ export default function WeatherDetails() {
       )}
 
       {!isLoading && !error && weather && (
-        <div className="grid grid-cols-5 gap-y-7 gap-x-7 md:gap-x-7 grid-rows-5 text-white mt-6">
+        <div className="grid grid-cols-5 gap-y-7 gap-x-7 md:gap-x-7 miniMob:grid-rows-4 tablet:grid-rows-2 text-white mt-6">
           <TodayWeather weather={weather} tempType={tempType} />
           <MoreDayInfo />
           <Cards />

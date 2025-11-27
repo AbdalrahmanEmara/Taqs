@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
 import { useWeather } from "../context/weatherContext";
@@ -13,8 +13,12 @@ export default function Search() {
   const bouncingDelay = 500;
   const [cityQuery, setCityQuery] = useState("");
   const inputRef = useRef(null);
+  const searchContainerRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cachedSuggestions, setCachedSuggestions] = useState([]);
   const [error, setError] = useState("");
+  const debouncedFetchRef = useRef(null);
 
   const { dispatch, lat, lng } = useWeather();
 
@@ -102,9 +106,11 @@ export default function Search() {
     [lat, lng, dispatch, error]
   );
   
-  const debouncedFetchSuggestions = useCallback(
-    debounce(async (query) => {
+  // Initialize debounced function once
+  if (!debouncedFetchRef.current) {
+    debouncedFetchRef.current = debounce(async (query) => {
       try {
+        console.log('Fetching suggestions for:', query);
         const res = await axios.get(
           "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
           {
@@ -115,6 +121,7 @@ export default function Search() {
             },
           }
         );
+        console.log('Got response:', res.data.data);
         const arr = res.data.data;
 
         const uniqueData = Array.from(
@@ -133,26 +140,56 @@ export default function Search() {
         });
 
         setSuggestions(finalFormData);
+        setCachedSuggestions(finalFormData);
+        setShowSuggestions(true);
       } catch (err) {
-        console.error(err.message);
+        console.error('Error fetching suggestions:', err.message);
+        setSuggestions([]);
+        setCachedSuggestions([]);
       }
-    }, bouncingDelay, {
-      "leading": false,
-      "trailing": true
-    }),
-    []
-  );
+    }, bouncingDelay);
+  }
 
   useEffect(() => {
-    if (!cityQuery) {
+    if (!cityQuery || cityQuery.trim() === "") {
       setSuggestions([]);
+      setCachedSuggestions([]);
+      setShowSuggestions(false);
+      if (debouncedFetchRef.current) {
+        debouncedFetchRef.current.cancel();
+      }
       return;
     }
-    debouncedFetchSuggestions(cityQuery);
-  }, [cityQuery, debouncedFetchSuggestions]);
+    if (debouncedFetchRef.current) {
+      debouncedFetchRef.current(cityQuery);
+    }
+  }, [cityQuery]);
+
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      if (debouncedFetchRef.current) {
+        debouncedFetchRef.current.cancel();
+      }
+    };
+  }, []);
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <>
+    <div ref={searchContainerRef}>
       <form
         onSubmit={(e) => e.preventDefault()}
         className="p-2 flex items-center bg-[#0E1421] rounded-lg">
@@ -160,18 +197,27 @@ export default function Search() {
         <input
           type="text"
           value={cityQuery}
-          onChange={(e) => setCityQuery((cityQuery) => e.target.value)}
+          onChange={(e) => setCityQuery(e.target.value)}
+          onFocus={() => {
+            if (cachedSuggestions.length > 0 && cityQuery) {
+              setSuggestions(cachedSuggestions);
+              setShowSuggestions(true);
+            }
+          }}
           placeholder="Search for a city..."
           className="bg-transparent outline-none text-white flex-grow p-1"
           ref={inputRef}
         />
       </form>
-      {suggestions[0]?.city && (
+      {showSuggestions && suggestions.length > 0 && (
         <SearchSuggestions
           suggestions={suggestions}
           setSuggestions={setSuggestions}
+          setShowSuggestions={setShowSuggestions}
+          setCityQuery={setCityQuery}
+          setCachedSuggestions={setCachedSuggestions}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ export default function MoreDayInfo() {
           <h1 className="text-xl font-semibold mb-4">Today / Week</h1>
           <ul className="flex gap-1 hours-status flex-shrink-0 flex-row bg-radial from-[#162850] to-[#121A2D] p-4 rounded-3xl overflow-hidden">
             {hours.map((hour) => (
-              <HourlyWeather hour={hour} />
+              <HourlyWeather hour={hour} key={hour.time} />
             ))}
           </ul>
         </div>

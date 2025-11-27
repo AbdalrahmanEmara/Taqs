@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
+import toast from "react-hot-toast";
 
 const WeatherContext = createContext();
 
@@ -37,7 +44,7 @@ function reducer(state, action) {
       };
 
     case "changeTempType":
-      return { ...state, tempType: (state.tempType === "C" ? "F" : "C") };
+      return { ...state, tempType: state.tempType === "C" ? "F" : "C" };
 
     case "error":
       return {
@@ -52,26 +59,39 @@ function reducer(state, action) {
 }
 
 function WeatherProvider({ children }) {
-  const [tempType, setTempType] = useState('C');
-  const [{ weather, isLoading, error, lat, lng } , dispatch] = useReducer(reducer, initialState);
+  const [tempType, setTempType] = useState("C");
+  const [{ weather, isLoading, error, lat, lng }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
-  useEffect(function () {
-  async function fetchLocation() {
+  useEffect(() => {
+    requestLocation();
+  }, []);
+
+  // Manual function to request location
+  const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           console.log("Location obtained:", position);
-          dispatch({
-            type: "loadingCoords",
-            payload: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            },
-          });
+          if (
+            lat === position.coords.latitude &&
+            lng === position.coords.longitude
+          )
+            toast.error("same location");
+          else
+            dispatch({
+              type: "loadingCoords",
+              payload: {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              },
+            });
         },
         (error) => {
           // Handle errors (permission denied, timeout, etc.)
-          console.error("Geolocation error:", error);
+          toast.error("permission denied");
           dispatch({
             type: "error",
             payload: `Location error: ${error.message}`,
@@ -79,8 +99,8 @@ function WeatherProvider({ children }) {
         },
         {
           enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     } else {
@@ -89,19 +109,29 @@ function WeatherProvider({ children }) {
         payload: "Geolocation is not supported by your browser",
       });
     }
-  }
-
-  fetchLocation();
-}, []);
+  };
 
   return (
-    <WeatherContext.Provider value={{ dispatch, weather, isLoading, error, lat, lng, tempType, setTempType }}>{children}</WeatherContext.Provider>
+    <WeatherContext.Provider
+      value={{
+        dispatch,
+        weather,
+        isLoading,
+        error,
+        lat,
+        lng,
+        tempType,
+        setTempType,
+        requestLocation,
+      }}>
+      {children}
+    </WeatherContext.Provider>
   );
 }
 
 function useWeather() {
   const context = useContext(WeatherContext);
-  if (context === undefined) 
+  if (context === undefined)
     throw new Error("Weather context was used outside the WeatherProvider");
 
   return context;
