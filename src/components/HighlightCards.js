@@ -11,7 +11,7 @@ export default function Cards() {
   const {weather, tempType} = useWeather();
   return (
     <>
-      <div className="col-span-5 tablet:col-span-2 row-span-1 bg-radial from-[#162850] to-[#121A2D] p-4 rounded-2xl">
+      <div className="col-span-5 tablet:col-span-2 row-span-1 bg-radial from-[#162850] to-[#121A2D] p-4 rounded-3xl">
         <p className="mb-4 font-semibold text-xl ml-2">Today Highlight</p>
         <div className="grid grid-rows-2 grid-cols-2 gap-3 flex-wrap text-center">
           <Card name={"Humidity"} value={weather.humidity}>
