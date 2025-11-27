@@ -17,7 +17,7 @@ export default function Header() {
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#742BEC] hover:bg-[#8c44ff] transition-colors duration-200"
           title="Get my location">
           <MdMyLocation className="text-xl" />
-          <span className="text-sm font-semibold">My Location</span>
+          {/* <span className="text-sm font-semibold">My Location</span> */}
         </button>
         <div className="flex gap-2 items-center">
         °C{" "}

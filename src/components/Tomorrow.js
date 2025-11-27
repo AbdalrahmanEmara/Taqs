@@ -2,6 +2,7 @@ import React from 'react'
 import { useWeather } from '../context/weatherContext'
 
 export default function Tomorrow({hours}) {
+  console.log(hours);
   const {tempType} = useWeather();
   return (
             <div className="bg-gradient-to-r from-[#0E1421] via-[#1D325F] to-[#0E1421] flex justify-between p-3 rounded-3xl relative">
@@ -9,11 +10,11 @@ export default function Tomorrow({hours}) {
             <div className="flex flex-col text-sm">
               <span className="font-semibold">Tomorrow</span>
               <span className="text-slate-700 text-xs">
-                {hours[1].condition.text}
+                {hours[0]?.condition.text}
               </span>
             </div>
             <span className="text-3xl font-semibold">
-              {tempType === "C" ? `${hours[1].temp_c}°` : `${hours[1].temp_f}°`}
+              {tempType === "C" ? `${hours[0].temp_c}°` : `${hours[0].temp_f}°`}
             </span>
           </div>
           <img

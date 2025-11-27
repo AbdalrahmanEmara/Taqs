@@ -10,7 +10,10 @@ export default function MoreDayInfo() {
   const currentHour = new Date().getHours();
   console.log( currentHour);
   const { hour } = weather.forecastDays[0];
-  const hours = hour.slice(currentHour, currentHour + 5);
+  let hours = hour.slice(currentHour, currentHour + 5);
+  if(hours.length < 5) {
+    hours = [...hours, ...hour.slice(0, 5 - hours.length)];
+  }
 
   return (
     <div className="bigBox pb-6 grid-cols-4 row-start-2 row-span-1 gap-3">

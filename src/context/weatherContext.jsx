@@ -65,9 +65,9 @@ function WeatherProvider({ children }) {
     initialState
   );
 
-  useEffect(() => {
-    requestLocation();
-  }, []);
+  // useEffect(() => {
+  //   requestLocation();
+  // }, []);
 
   // Manual function to request location
   const requestLocation = () => {
