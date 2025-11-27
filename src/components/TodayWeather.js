@@ -52,7 +52,7 @@ export default function TodayWeather({ weather, tempType }) {
 
           <div className="text-center mob:pr-6">
             <p className="text-2xl font-semibold mb-1 ">
-              {weather.forecastDays[0].day.condition.text}
+              {weather.forecastDays[0].hour[today.getHours()].condition.text}
             </p>
             <p>
               Feels like{" "}
