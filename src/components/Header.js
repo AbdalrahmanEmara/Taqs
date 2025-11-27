@@ -3,7 +3,17 @@ import { MdMyLocation } from "react-icons/md";
 import { useWeather } from "../context/weatherContext";
 
 export default function Header() {
-  const { tempType, setTempType, requestLocation } = useWeather();
+  const { tempType, setTempType, requestLocation, dispatch, lat, lng } = useWeather();
+
+  function handleClick() {
+    const saved = localStorage.getItem("location");
+    if (!saved) requestLocation();
+    else {
+      const value = JSON.parse(saved);
+      if (lat !== value.lat && lng !== value.lng)
+        dispatch({type: 'loadingCoords', payload: {lat: value.lat, lng: value.lng}});
+    } 
+  }
 
   return (
     <header className="flex text-white my-4 pb-3">
@@ -13,7 +23,7 @@ export default function Header() {
       </h1>
       <div className="flex gap-4 items-center justify-center">
         <button
-          onClick={requestLocation}
+          onClick={handleClick}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#742BEC] hover:bg-[#8c44ff] transition-colors duration-200"
           title="Get my location">
           <MdMyLocation className="text-xl" />

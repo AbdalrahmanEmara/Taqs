@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import axios from "axios";
 import { useWeather } from "../context/weatherContext";
@@ -18,7 +18,6 @@ export default function Search() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cachedSuggestions, setCachedSuggestions] = useState([]);
   const [error, setError] = useState("");
-  const debouncedFetchRef = useRef(null);
 
   const { dispatch, lat, lng } = useWeather();
 
@@ -106,73 +105,71 @@ export default function Search() {
     [lat, lng, dispatch, error]
   );
   
-  // Initialize debounced function once
-  if (!debouncedFetchRef.current) {
-    debouncedFetchRef.current = debounce(async (query) => {
-      try {
-        console.log('Fetching suggestions for:', query);
-        const res = await axios.get(
-          "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
-          {
-            params: { namePrefix: query, limit: 10 },
-            headers: {
-              "x-rapidapi-key": CITYNAMEKEY,
-              "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
-            },
-          }
-        );
-        console.log('Got response:', res.data.data);
-        const arr = res.data.data;
+  // Stable function that won't change on re-renders
+  const fetchSuggestions = useCallback(async (query) => {
+    try {
+      console.log('Fetching suggestions for:', query);
+      const res = await axios.get(
+        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
+        {
+          params: { namePrefix: query, limit: 10 },
+          headers: {
+            "x-rapidapi-key": CITYNAMEKEY,
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
+          },
+        }
+      );
+      console.log('Got response:', res.data.data);
+      const arr = res.data.data;
 
-        const uniqueData = Array.from(
-          new Map(
-            arr.map((item) => [`${item.city}|${item.country}`, item])
-          ).values()
-        );
+      const uniqueData = Array.from(
+        new Map(
+          arr.map((item) => [`${item.city}|${item.country}`, item])
+        ).values()
+      );
 
-        const finalFormData = uniqueData.map((item) => {
-          return {
-            city: item.city,
-            country: item.country,
-            lat: item.latitude,
-            lng: item.longitude,
-          };
-        });
+      const finalFormData = uniqueData.map((item) => {
+        return {
+          city: item.city,
+          country: item.country,
+          lat: item.latitude,
+          lng: item.longitude,
+        };
+      });
 
-        setSuggestions(finalFormData);
-        setCachedSuggestions(finalFormData);
-        setShowSuggestions(true);
-      } catch (err) {
-        console.error('Error fetching suggestions:', err.message);
-        setSuggestions([]);
-        setCachedSuggestions([]);
-      }
-    }, bouncingDelay);
-  }
+      setSuggestions(finalFormData);
+      setCachedSuggestions(finalFormData);
+      setShowSuggestions(true);
+    } catch (err) {
+      console.error('Error fetching suggestions:', err.message);
+      setSuggestions([]);
+      setCachedSuggestions([]);
+    }
+  }, []);
+
+  // Create debounced version using useMemo so it's stable
+  const debouncedFetchSuggestions = useMemo(
+    () => debounce(fetchSuggestions, bouncingDelay),
+    [fetchSuggestions]
+  );
 
   useEffect(() => {
     if (!cityQuery || cityQuery.trim() === "") {
       setSuggestions([]);
       setCachedSuggestions([]);
       setShowSuggestions(false);
-      if (debouncedFetchRef.current) {
-        debouncedFetchRef.current.cancel();
-      }
+      debouncedFetchSuggestions.cancel();
       return;
     }
-    if (debouncedFetchRef.current) {
-      debouncedFetchRef.current(cityQuery);
-    }
-  }, [cityQuery]);
+    debouncedFetchSuggestions(cityQuery);
+  }, [cityQuery, debouncedFetchSuggestions]);
 
   // Cleanup debounced function on unmount
   useEffect(() => {
     return () => {
-      if (debouncedFetchRef.current) {
-        debouncedFetchRef.current.cancel();
-      }
+      debouncedFetchSuggestions.cancel();
     };
-  }, []);
+  }, [debouncedFetchSuggestions]);
 
   // Click outside to close suggestions
   useEffect(() => {

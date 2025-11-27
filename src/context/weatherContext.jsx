@@ -65,10 +65,6 @@ function WeatherProvider({ children }) {
     initialState
   );
 
-  // useEffect(() => {
-  //   requestLocation();
-  // }, []);
-
   // Manual function to request location
   const requestLocation = () => {
     if (navigator.geolocation) {
@@ -81,6 +77,7 @@ function WeatherProvider({ children }) {
           )
             toast.error("same location");
           else
+          {
             dispatch({
               type: "loadingCoords",
               payload: {
@@ -88,6 +85,8 @@ function WeatherProvider({ children }) {
                 lng: position.coords.longitude,
               },
             });
+            localStorage.setItem("location", JSON.stringify({lat: position.coords.latitude, lng: position.coords.longitude}));
+          }
         },
         (error) => {
           // Handle errors (permission denied, timeout, etc.)
@@ -110,6 +109,10 @@ function WeatherProvider({ children }) {
       });
     }
   };
+
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
   return (
     <WeatherContext.Provider
