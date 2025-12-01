@@ -1,7 +1,4 @@
-// import { TiWeatherPartlySunny } from "react-icons/ti";
-// import OtherWeatherInfo from "./OtherWeatherInfo";
 import { MdLocationOn } from "react-icons/md";
-// import BigBox from "./BigBox";
 
 export default function TodayWeather({ weather, tempType }) {
   const today = new Date();
@@ -11,7 +8,6 @@ export default function TodayWeather({ weather, tempType }) {
     month: "short",
     year: "numeric",
   });
-  console.log(weather);
   const weekday = formattedDate.split(" ")[0].slice(0, -1);
   return (
     <div className="bigBox row-span-1" >

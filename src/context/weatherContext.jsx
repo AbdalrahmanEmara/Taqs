@@ -28,7 +28,6 @@ function reducer(state, action) {
     case "loadingCoords":
       return {
         ...state,
-        // weather: null,
         lat: action.payload.lat,
         lng: action.payload.lng,
         isLoading: true,
@@ -70,7 +69,6 @@ function WeatherProvider({ children }) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log("Location obtained:", position);
           if (
             lat === position.coords.latitude &&
             lng === position.coords.longitude

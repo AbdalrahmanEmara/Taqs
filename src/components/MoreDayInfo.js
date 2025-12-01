@@ -1,5 +1,4 @@
 import React from "react";
-// import BigBox from "./BigBox";
 import { useWeather } from "../context/weatherContext";
 import HourlyWeather from "./HourlyWeather";
 import SunriseSunset from "./SunriseSunset";
@@ -8,7 +7,6 @@ import Tomorrow from "./Tomorrow";
 export default function MoreDayInfo() {
   const { weather } = useWeather();
   const currentHour = new Date().getHours();
-  console.log( currentHour);
   const { hour } = weather.forecastDays[0];
   let hours = hour.slice(currentHour, currentHour + 5);
   if(hours.length < 5) {

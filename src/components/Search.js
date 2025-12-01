@@ -4,7 +4,6 @@ import axios from "axios";
 import { useWeather } from "../context/weatherContext";
 import SearchSuggestions from "./SearchSuggestions";
 import { debounce } from "lodash";
-import { CiYoutube } from "react-icons/ci";
 
 const KEY = "81a355aac55648eb805160737252411";
 const CITYNAMEKEY = "cd2ff3b48cmsh5bf99a28c9068a1p177b0fjsnd1d2bdf449bf";
@@ -40,8 +39,6 @@ export default function Search() {
             }
           );
 
-          console.log(res);
-
           const {
             temp_c: tempC,
             temp_f: tempF,
@@ -56,7 +53,6 @@ export default function Search() {
           const { name: city, country } = res.data.location;
 
           const forecastDays = res.data.forecast.forecastday;
-          console.log(res);
 
           const currentWeather = {
             tempC,

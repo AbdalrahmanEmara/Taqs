@@ -2,7 +2,6 @@ import React from 'react'
 import { useWeather } from '../context/weatherContext'
 
 export default function Tomorrow({hours}) {
-  console.log(hours);
   const {tempType} = useWeather();
   return (
             <div className="bg-gradient-to-r from-[#0E1421] via-[#1D325F] to-[#0E1421] flex justify-between p-3 rounded-3xl relative">
