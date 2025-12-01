@@ -17,7 +17,7 @@ export default function MoreDayInfo() {
     <div className="bigBox pb-6 grid-cols-4 row-start-2 row-span-1 gap-3">
       <div className="col-span-4 mob:col-span-3 flex flex-col justify-between gap-6">
         <div>
-          <h1 className="text-xl font-semibold mb-4">Today / Week</h1>
+          <h1 className="text-xl font-semibold mb-4">Today</h1>
           <ul className="flex gap-1 hours-status flex-shrink-0 flex-row bg-radial from-[#162850] to-[#121A2D] p-4 rounded-3xl overflow-hidden">
             {hours.map((hour) => (
               <HourlyWeather hour={hour} key={hour.time} />
